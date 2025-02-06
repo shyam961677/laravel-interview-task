@@ -2,6 +2,8 @@
 
 @section('content')
     <h2>Edit User</h2>
+
+    @include('common.error')
     <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')

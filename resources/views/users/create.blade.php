@@ -2,6 +2,9 @@
 
 @section('content')
     <h2>Create New User</h2>
+
+    @include('common.error')
+    
     <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         

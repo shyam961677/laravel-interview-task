@@ -19,6 +19,8 @@ trait Encryptable {
 
         if ( !empty($value) && in_array($key, self::$encryptable) ) {
 
+            // echo "SELECT AES_ENCRYPT('$value', '".env('ENCRYPTION_KEY')."') as column_value";die;
+                
             $record = DB::select("SELECT AES_ENCRYPT('$value', '".env('ENCRYPTION_KEY')."') as column_value");
             
             if (isset($record[0]->column_value)) {
@@ -38,37 +40,5 @@ trait Encryptable {
 		}
 		return $return;
 	}
-  
-    /**
-     * When need to make sure that we iterate through
-     * all the keys.
-     *
-     * @return array
-     */
-    /*public function attributesToArray1() {
-
-        $attributes = parent::attributesToArray();
-
-        // dd(self::$encryptable);
-        
-        foreach (self::$encryptable as $key) {
-           
-            // dd($attributes[$key]);
-
-            if (array_key_exists($key, $attributes)) {
-            
-                $record = DB::select("SELECT AES_DECRYPT('$attributes[$key]', '".\Helper::getEncryptionKey()."') as column_value");
-                
-                // dd($record);
-
-                if (isset($record[0]->column_value)) {
-
-                    $attributes[$key] = $record[0]->column_value;
-                }
-            }
-        }
-        
-        return $attributes;
-    }*/
 
 }

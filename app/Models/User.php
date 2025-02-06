@@ -12,7 +12,7 @@ use \App\Traits\Encryptable;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
-    // use Encryptable;
+    use Encryptable;
 
     /**
      * The attributes that are mass assignable.
