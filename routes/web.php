@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DBUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,8 +19,10 @@ Route::get('/', function () {
     return abort(404);
 });
 
-Route::get('users/export', 'App\Http\Controllers\UserController@export')->name('users.export');
 Route::resource('users', UserController::class);
+Route::get('dbusers/export', 'App\Http\Controllers\DBUserController@export')->name('dbusers.export');
+Route::get('dbusers/import', 'App\Http\Controllers\DBUserController@import')->name('dbusers.import');
+Route::resource('dbusers', DBUserController::class);
 
 // Fallback for not exist routes
 Route::fallback(function () {

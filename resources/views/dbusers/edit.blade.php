@@ -6,7 +6,7 @@
     @include('common.error')
     <div class="row">
         <div class="col-6 col-offset-lg-3">
-            <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('dbusers.update', $user->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 

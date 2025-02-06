@@ -55,6 +55,17 @@ class User extends Authenticatable
         return User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->find($id);
     }
 
+    public static function sessionAllUsers(){
+
+        return session('userSessionArray', []);
+    }
+
+    public static function sessionFindUser($id){
+
+        $userSessionArray = session('userSessionArray', []);
+        return $userSessionArray[$id] ?? abort(404);
+    }
+
     public static function decryptableColumnsMapping($columns = []){
 
         if(empty($columns)){

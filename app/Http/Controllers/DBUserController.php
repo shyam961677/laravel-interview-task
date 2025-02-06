@@ -9,23 +9,17 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
 use Session;
 
-class UserController extends Controller
+class DBUserController extends Controller
 {
     public function index()
     {   
-        // Session::flush();
-        // Session::regenerate(true);
-
-        // $userSessionArray = [];
-        $userSessionArray = User::sessionAllUsers();
-        // dd($userSessionArray);
-
-        return view('users.index', compact('userSessionArray'));
+        $users = User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->get();
+        return view('dbusers.index', compact('users'));
     }
 
     public function create()
     {
-        return view('users.create');
+        return view('dbusers.create');
     }
 
     public function store(Request $request)
@@ -52,8 +46,6 @@ class UserController extends Controller
             $imagePath  = 'uploads/images/'.$imageName;
         }
 
-        $uniqid = uniqid();
-
         $newUserArr = [
             'name'     => $request->name,
             'email'    => $request->email,
@@ -62,26 +54,28 @@ class UserController extends Controller
             'date'     => $request->date,
             'role'     => $request->role,
             'image'    => $imagePath,
-            'id'        => $uniqid,
         ];
+        
+        User::create($newUserArr);
 
-        $userSessionArray[$uniqid] = (object) $newUserArr;
-        session(['userSessionArray' => $userSessionArray]);
-
-        return redirect()->route('users.index')
+        return redirect()->route('dbusers.index')
                          ->with('success', 'User created successfully.');
     }
 
     public function show($id)
     {   
-        $user = User::sessionFindUser($id);
-        return view('users.show', compact('user'));
+        $user = User::__find($id);
+        // dd($user);
+        // $user = User::findOrFail($id);
+        return view('dbusers.show', compact('user'));
     }
 
     public function edit($id)
     {
-        $user = User::sessionFindUser($id);
-        return view('users.edit', compact('user'));
+        $user = User::__find($id);
+        // dd($user);
+        // $user = User::findOrFail($id);
+        return view('dbusers.edit', compact('user'));
     }
 
     public function update(Request $request, $id)
@@ -95,7 +89,7 @@ class UserController extends Controller
             'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
         ]);
 
-        $user = User::sessionFindUser($id);
+        $user = User::findOrFail($id);
 
         if ($request->hasFile('image')) {
             $image      = $request->file('image');
@@ -113,11 +107,9 @@ class UserController extends Controller
         $user->mobile = $request->mobile;
         $user->date   = $request->date;
         $user->role   = $request->role;
-        
-        $userSessionArray[$id] = $user;
-        session(['userSessionArray' => $userSessionArray]);
+        $user->save();
 
-        return redirect()->route('users.index')
+        return redirect()->route('dbusers.index')
                          ->with('success', 'User updated successfully.');
     }
 
@@ -129,8 +121,17 @@ class UserController extends Controller
         }
         $user->delete();
 
-        return redirect()->route('users.index')
+        return redirect()->route('dbusers.index')
                          ->with('success', 'User deleted successfully.');
     }
-    
+
+    public function export(Request $request)
+    {
+        return Excel::download(new ExportUser(), 'User-'.now()->setTimezone('Asia/Kolkata')->format('d-M-Y-H-i-s').'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        // form
+    }
 }
