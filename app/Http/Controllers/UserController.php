@@ -11,8 +11,9 @@ use App\Exports\ExportUser;
 class UserController extends Controller
 {
     public function index()
-    {
-        $users = User::all();
+    {   
+        $users = User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->get();
+        // $users = User::all();
         return view('users.index', compact('users'));
     }
 

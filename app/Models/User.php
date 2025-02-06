@@ -49,4 +49,25 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public static function decryptableColumnsMapping($columns = []){
+
+        if(empty($columns)){
+            $columns = self::$encryptable;
+        }
+
+        $selectColumnArr = [];
+
+        if(isset($columns) && !empty($columns)){
+
+            foreach ($columns as $key => $column) {
+
+                $selectColumnArr[] = "AES_DECRYPT(".$column.", '".env('ENCRYPTION_KEY')."') as ".$column;
+                
+            }
+        }
+
+        return implode(",",  $selectColumnArr );
+        
+    }
 }
