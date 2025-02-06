@@ -7,15 +7,22 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportUser;
+use Session;
 
 class UserController extends Controller
 {
     public function index()
     {   
+        // Session::forget('userSessionArray');
         // dd(User::__find(1));
-        $users = User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->get();
         // $users = User::all();
-        return view('users.index', compact('users'));
+        $users = User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->get();
+
+        $userSessionArray = session('userSessionArray', []);
+        $userSessionArray = [];
+        // dd($userSessionArray);
+
+        return view('users.index', compact('users', 'userSessionArray'));
     }
 
     public function create()
@@ -25,6 +32,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+
+        $userSessionArray = session('userSessionArray');
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
@@ -44,7 +54,7 @@ class UserController extends Controller
             $imagePath  = 'uploads/images/'.$imageName;
         }
 
-        User::create([
+        $newUserArr = [
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
@@ -52,21 +62,31 @@ class UserController extends Controller
             'date'     => $request->date,
             'role'     => $request->role,
             'image'    => $imagePath,
-        ]);
+        ];
+
+        unset($userSessionArray[0]);
+
+        $userSessionArray[uniqid()] = $newUserArr;
+        session(['userSessionArray' => $userSessionArray]);
+        User::create($newUserArr);
 
         return redirect()->route('users.index')
                          ->with('success', 'User created successfully.');
     }
 
     public function show($id)
-    {
-        $user = User::findOrFail($id);
+    {   
+        $user = User::__find($id);
+        // dd($user);
+        // $user = User::findOrFail($id);
         return view('users.show', compact('user'));
     }
 
     public function edit($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::__find($id);
+        // dd($user);
+        // $user = User::findOrFail($id);
         return view('users.edit', compact('user'));
     }
 
