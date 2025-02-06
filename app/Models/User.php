@@ -50,6 +50,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public static function __find($id){
+
+        return User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->find($id);
+    }
+
     public static function decryptableColumnsMapping($columns = []){
 
         if(empty($columns)){

@@ -12,6 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {   
+        // dd(User::__find(1));
         $users = User::selectRaw('*')->selectRaw( User::decryptableColumnsMapping() )->get();
         // $users = User::all();
         return view('users.index', compact('users'));
