@@ -19,7 +19,10 @@ Route::get('/', function () {
     return abort(404);
 });
 
+Route::get('users/final-submit', 'App\Http\Controllers\UserController@finalSubmit')->name('users.final-submit');
 Route::resource('users', UserController::class);
+
+
 Route::get('dbusers/export', 'App\Http\Controllers\DBUserController@export')->name('dbusers.export');
 Route::get('dbusers/import', 'App\Http\Controllers\DBUserController@import')->name('dbusers.import');
 Route::resource('dbusers', DBUserController::class);

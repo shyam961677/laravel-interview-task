@@ -4,9 +4,12 @@
     <div class="d-flex justify-content-between mb-3">
         <h2>User List</h2>
         <div class="flex">
+
             <a class="btn btn-primary" href="{{ route('users.create') }}">Create New User</a>
             <a class="btn btn-secondary" href="{{ route('dbusers.export') }}">Export Users</a>
             <a class="btn btn-info" href="{{ route('dbusers.import') }}">Import Users</a>
+            <a class="btn btn-info" href="{{ route('users.index') }}">Show Temp Users</a>
+
         </div>
     </div>
 

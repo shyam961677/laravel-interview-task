@@ -31,8 +31,6 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        $userSessionArray = session('userSessionArray');
-
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|unique:users,email',
@@ -40,7 +38,7 @@ class UserController extends Controller
             'mobile'   => 'nullable|string|max:20',
             'date'     => 'nullable|date',
             'role'     => 'required|in:Admin,User',
-            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg'
         ]);
 
         $imagePath = null;
@@ -65,6 +63,7 @@ class UserController extends Controller
             'id'        => $uniqid,
         ];
 
+        $userSessionArray = User::sessionAllUsers();
         $userSessionArray[$uniqid] = (object) $newUserArr;
         session(['userSessionArray' => $userSessionArray]);
 
@@ -92,7 +91,7 @@ class UserController extends Controller
             'mobile'   => 'nullable|string|max:20',
             'date'     => 'nullable|date',
             'role'     => 'required|in:Admin,User',
-            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'image'    => 'nullable|image|mimes:jpeg,png,jpg,gif,svg'
         ]);
 
         $user = User::sessionFindUser($id);
@@ -114,6 +113,7 @@ class UserController extends Controller
         $user->date   = $request->date;
         $user->role   = $request->role;
         
+        $userSessionArray = User::sessionAllUsers();
         $userSessionArray[$id] = $user;
         session(['userSessionArray' => $userSessionArray]);
 
@@ -123,14 +123,43 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::sessionFindUser($id);
         if ($user->image && file_exists(public_path($user->image))) {
             unlink(public_path($user->image));
         }
-        $user->delete();
+
+        $userSessionArray = User::sessionAllUsers();
+        unset($userSessionArray[$id]);
+        session(['userSessionArray' => $userSessionArray]);
 
         return redirect()->route('users.index')
                          ->with('success', 'User deleted successfully.');
     }
-    
+
+    public function finalSubmit()
+    {
+
+        $userSessionArray = User::sessionAllUsers();
+        // dd($userSessionArray);
+
+        if(!empty($userSessionArray)) {
+            foreach ($userSessionArray as $key => $value) {
+
+                $value2 = (array) $value;
+                unset($value2['id']);
+                User::create($value2);
+            }
+
+            Session::flush();
+            Session::regenerate(true);
+            
+            return redirect()->route('users.index')
+                         ->with('success', 'Users saved successfully.');
+        }
+        
+        return redirect()->route('users.index')
+                         ->with('error', 'No user to save.');
+        
+    }
+
 }

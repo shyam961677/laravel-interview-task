@@ -52,6 +52,12 @@
                         </td>
                     </tr>
                 @endforeach
+
+                <tr>
+                    <td colspan="8" class="text-center">
+                        <a class="btn btn-primary" href="{{ route('users.final-submit') }}">Final Submit</a>
+                    </td>
+                </tr>
             @endif
         </tbody>
     </table>
